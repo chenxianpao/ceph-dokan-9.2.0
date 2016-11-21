@@ -157,7 +157,7 @@ public:
   /* Do not use when a particular hash function is needed */
   explicit hobject_t(const sobject_t &o) :
     oid(o.oid), snap(o.snap), max(false), pool(POOL_META) {
-    set_hash(std::hash<sobject_t>()(o));
+    set_hash(CEPH_HASH_NAMESPACE::hash<sobject_t>()(o));
   }
 
   // maximum sorted value.

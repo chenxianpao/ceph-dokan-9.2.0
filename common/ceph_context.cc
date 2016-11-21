@@ -20,6 +20,7 @@
 #include "common/perf_counters.h"
 #include "common/Thread.h"
 #include "common/ceph_context.h"
+#include "common/ceph_crypto.h"
 #include "common/config.h"
 #include "common/debug.h"
 //by ketor #include./common/HeartbeatMap.h"
@@ -400,8 +401,8 @@ CephContext::CephContext(uint32_t module_type_)
   //_admin_socket->register_command("log dump", "log dump", _admin_hook, "dump recent log entries to log file");
   //_admin_socket->register_command("log reopen", "log reopen", _admin_hook, "reopen log file");
 
-  _crypto_none = new CryptoNone;
-  _crypto_aes = new CryptoAES;
+  _crypto_none = CryptoHandler::create(CEPH_CRYPTO_NONE);
+  _crypto_aes = CryptoHandler::create(CEPH_CRYPTO_AES);
 }
 
 CephContext::~CephContext()
@@ -551,7 +552,7 @@ void CephContext::disable_perf_counter()
   _cct_perf = NULL;
   ceph_spin_unlock(&_cct_perf_lock);
 }
-
+/*
 void CephContext::refresh_perf_values()
 {
   ceph_spin_lock(&_cct_perf_lock);
@@ -561,6 +562,7 @@ void CephContext::refresh_perf_values()
   }
   ceph_spin_unlock(&_cct_perf_lock);
 }
+*/
 /*by ketor AdminSocket *CephContext::get_admin_socket()
 {
   return _admin_socket;

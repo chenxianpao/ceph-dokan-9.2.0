@@ -39,9 +39,11 @@
 #include <istream>
 #include <iomanip>
 #include <list>
+#include <vector>
 #include <string>
 #include <exception>
-
+#include <type_traits>
+#include "sys/types.h"
 #include "page.h"
 #include "crc32c.h"
 

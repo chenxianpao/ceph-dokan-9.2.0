@@ -166,6 +166,7 @@ extern const char *ceph_osd_state_name(int s);
 #define CEPH_OSD_OP_MODE_CACHE 0x8000
 
 #define CEPH_OSD_OP_TYPE       0x0f00
+#define CEPH_OSD_OP_TYPE_LOCK  0x0100
 #define CEPH_OSD_OP_TYPE_DATA  0x0200
 #define CEPH_OSD_OP_TYPE_ATTR  0x0300
 #define CEPH_OSD_OP_TYPE_EXEC  0x0400
@@ -305,6 +306,10 @@ __CEPH_FORALL_OSD_OPS(GENERATE_ENUM_ENTRY)
 #undef GENERATE_ENUM_ENTRY
 };
 
+static inline int ceph_osd_op_type_lock(int op)
+{
+	return (op & CEPH_OSD_OP_TYPE) == CEPH_OSD_OP_TYPE_LOCK;
+}
 static inline int ceph_osd_op_type_data(int op)
 {
 	return (op & CEPH_OSD_OP_TYPE) == CEPH_OSD_OP_TYPE_DATA;

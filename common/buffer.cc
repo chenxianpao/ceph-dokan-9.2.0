@@ -1737,7 +1737,7 @@ int buffer::list::write_fd(int fd) const
 //    }
 //  }
 //  return 0;
-//}
+}
 
 void buffer::list::prepare_iov(std::vector<iovec> *piov) const
 {

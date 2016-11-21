@@ -2236,8 +2236,9 @@ public:
   ceph_tid_t read_trunc(const object_t& oid, const object_locator_t& oloc,
 	     uint64_t off, uint64_t len, snapid_t snap, bufferlist *pbl, int flags,
 	     uint64_t trunc_size, __u32 trunc_seq,
-	     Context *onfinish,
-	     version_t *objver = NULL, ObjectOperation *extra_ops = NULL) {
+	     Context *onfinish, 
+	     version_t *objver = NULL, ObjectOperation *extra_ops = NULL,
+	     int op_flags = 0) {
     vector<OSDOp> ops;
     int i = init_ops(ops, 1, extra_ops);
     ops[i].op.op = CEPH_OSD_OP_READ;

@@ -32,6 +32,9 @@
 #include <errno.h>
 #include <deque>
 
+
+
+
 #define dout_subsys ceph_subsys_
 
 static void global_init_set_globals(CephContext *cct)
