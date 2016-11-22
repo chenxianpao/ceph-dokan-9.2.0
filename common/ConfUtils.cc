@@ -23,6 +23,7 @@
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include "windows.h"
 #include <unistd.h>
 
 #include "include/buffer.h"

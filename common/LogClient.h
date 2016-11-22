@@ -17,7 +17,7 @@
 
 #include "common/LogEntry.h"
 #include "common/Mutex.h"
-
+//#include "boost/shared_ptr.hpp"
 #include <iosfwd>
 #include <sstream>
 
@@ -137,7 +137,7 @@ public:
   }
   bool must_log_to_monitors() { return log_to_monitors; }
 
-  typedef shared_ptr<LogChannel> Ref;
+  typedef std::shared_ptr<LogChannel> Ref;
 
   /**
    * update config values from parsed k/v map for each config option

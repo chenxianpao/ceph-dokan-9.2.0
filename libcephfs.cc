@@ -30,7 +30,7 @@
 #include "messages/MMonMap.h"
 #include "msg/Messenger.h"
 #include "include/assert.h"
-
+//#include <functional>
 struct ceph_mount_info
 {
 public:
@@ -479,7 +479,7 @@ extern "C" int ceph_readdir_r(struct ceph_mount_info *cmount, struct ceph_dir_re
 }
 
 extern "C" int ceph_readdirplus_r(struct ceph_mount_info *cmount, struct ceph_dir_result *dirp,
-				  struct dirent *de, struct stat *st, int *stmask)
+				  struct dirent *de, struct stat_ceph *st, int *stmask)
 {
   if (!cmount->is_mounted())
     return -ENOTCONN;
@@ -587,7 +587,7 @@ extern "C" int ceph_symlink(struct ceph_mount_info *cmount, const char *existing
 
 // inode stuff
 extern "C" int ceph_stat(struct ceph_mount_info *cmount, const char *path,
-			 struct stat *stbuf)
+			 struct stat_ceph *stbuf)
 {
   if (!cmount->is_mounted())
     return -ENOTCONN;
@@ -595,7 +595,7 @@ extern "C" int ceph_stat(struct ceph_mount_info *cmount, const char *path,
 }
 
 extern "C" int ceph_lstat(struct ceph_mount_info *cmount, const char *path,
-			  struct stat *stbuf)
+			  struct stat_ceph *stbuf)
 {
   if (!cmount->is_mounted())
     return -ENOTCONN;
@@ -603,7 +603,7 @@ extern "C" int ceph_lstat(struct ceph_mount_info *cmount, const char *path,
 }
 
 extern "C" int ceph_setattr(struct ceph_mount_info *cmount, const char *relpath,
-			    struct stat *attr, int mask)
+			    struct stat_ceph *attr, int mask)
 {
   if (!cmount->is_mounted())
     return -ENOTCONN;
@@ -851,7 +851,7 @@ extern "C" int ceph_fallocate(struct ceph_mount_info *cmount, int fd, int mode,
   return cmount->get_client()->fallocate(fd, mode, offset, length);
 }
 
-extern "C" int ceph_fstat(struct ceph_mount_info *cmount, int fd, struct stat *stbuf)
+extern "C" int ceph_fstat(struct ceph_mount_info *cmount, int fd, struct stat_ceph *stbuf)
 {
   if (!cmount->is_mounted())
     return -ENOTCONN;

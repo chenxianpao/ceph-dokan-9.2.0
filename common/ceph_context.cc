@@ -552,17 +552,19 @@ void CephContext::disable_perf_counter()
   _cct_perf = NULL;
   ceph_spin_unlock(&_cct_perf_lock);
 }
-/*
+
 void CephContext::refresh_perf_values()
 {
+/*
   ceph_spin_lock(&_cct_perf_lock);
   if (_cct_perf) {
     _cct_perf->set(l_cct_total_workers, _heartbeat_map->get_total_workers());
     _cct_perf->set(l_cct_unhealthy_workers, _heartbeat_map->get_unhealthy_workers());
   }
   ceph_spin_unlock(&_cct_perf_lock);
-}
 */
+}
+
 /*by ketor AdminSocket *CephContext::get_admin_socket()
 {
   return _admin_socket;

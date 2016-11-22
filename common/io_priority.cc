@@ -13,6 +13,7 @@
  */
 
 #include <sys/types.h>
+#include "windows.h"
 #include <unistd.h>
 //by ketor #include <sys/syscall.h>   /* For SYS_xxx definitions */
 #include <algorithm>

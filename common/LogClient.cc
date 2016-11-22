@@ -15,6 +15,8 @@
 
 
 #include "include/types.h"
+//#include <boost/shared_ptr.hpp>
+
 #include "include/str_map.h"
 
 #include "msg/Messenger.h"
@@ -33,6 +35,7 @@
 #include <sys/param.h>
 #include <sys/mount.h>
 #endif // DARWIN
+
 
 #include "common/LogClient.h"
 

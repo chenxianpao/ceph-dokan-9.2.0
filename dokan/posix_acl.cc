@@ -1,5 +1,5 @@
 /* Extended attribute names */
-
+#include "windows.h"
 #include "common/ceph-mingw-type.h"
 #include "dokan/posix_acl.h"
 

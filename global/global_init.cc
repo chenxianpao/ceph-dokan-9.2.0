@@ -31,7 +31,9 @@
 
 #include <errno.h>
 #include <deque>
-
+#include "stdlib.h"
+//#include "windows.h"
+//#include "unistd.h"
 
 
 

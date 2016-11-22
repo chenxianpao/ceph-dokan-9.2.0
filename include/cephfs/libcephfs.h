@@ -440,7 +440,7 @@ int ceph_readdir_r(struct ceph_mount_info *cmount, struct ceph_dir_result *dirp,
  *          and a negative error code on failure.
  */
 int ceph_readdirplus_r(struct ceph_mount_info *cmount, struct ceph_dir_result *dirp, struct dirent *de,
-		       struct stat *st, int *stmask);
+		       struct stat_ceph *st, int *stmask);
 
 /**
  * Gets multiple directory entries.
@@ -606,7 +606,7 @@ int ceph_rename(struct ceph_mount_info *cmount, const char *from, const char *to
  * @param stbuf the stat struct that will be filled in with the file's statistics.
  * @returns 0 on success or negative error code on failure.
  */
-int ceph_stat(struct ceph_mount_info *cmount, const char *path, struct stat *stbuf);
+int ceph_stat(struct ceph_mount_info *cmount, const char *path, struct stat_ceph *stbuf);
 
 /**
  * Get a file's statistics and attributes, without following symlinks.
@@ -616,7 +616,7 @@ int ceph_stat(struct ceph_mount_info *cmount, const char *path, struct stat *stb
  * @param stbuf the stat struct that will be filled in with the file's statistics.
  * @returns 0 on success or negative error code on failure.
  */
-int ceph_lstat(struct ceph_mount_info *cmount, const char *path, struct stat *stbuf);
+int ceph_lstat(struct ceph_mount_info *cmount, const char *path, struct stat_ceph *stbuf);
 
 /**
  * Set a file's attributes.
@@ -627,7 +627,7 @@ int ceph_lstat(struct ceph_mount_info *cmount, const char *path, struct stat *st
  * @param mask a mask of all the stat values that have been set on the stat struct.
  * @returns 0 on success or negative error code on failure.
  */
-int ceph_setattr(struct ceph_mount_info *cmount, const char *relpath, struct stat *attr, int mask);
+int ceph_setattr(struct ceph_mount_info *cmount, const char *relpath, struct stat_ceph *attr, int mask);
 
 /**
  * Change the mode bits (permissions) of a file/directory.
@@ -888,7 +888,7 @@ int ceph_fallocate(struct ceph_mount_info *cmount, int fd, int mode,
  *    function.
  * @returns 0 on success or a negative error code on failure
  */
-int ceph_fstat(struct ceph_mount_info *cmount, int fd, struct stat *stbuf);
+int ceph_fstat(struct ceph_mount_info *cmount, int fd, struct stat_ceph *stbuf);
 
 /** @} file */
 

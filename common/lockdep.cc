@@ -144,7 +144,9 @@ int lockdep_register(const char *name)
 //  return id;
   return 0;//by ketor
 }
-
+void lockdep_unregister(int id)
+{
+}
 
 // does b follow a?
 static bool does_follow(int a, int b)
@@ -173,7 +175,7 @@ static bool does_follow(int a, int b)
   return false;
 }
 
-int lockdep_will_lock(const char *name, int id)
+int lockdep_will_lock(const char *name, int id, bool force_backtrace)
 {
 //by ketor  pthread_t p = pthread_self();
 //  if (id < 0) id = lockdep_register(name);
