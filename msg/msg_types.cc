@@ -86,11 +86,11 @@ bool entity_addr_t::parse(const char *s, const char **end)
   // ipv4?
   struct in_addr a4;
   struct in6_addr a6;
-  if (inet_pton(AF_INET, buf4, &a4)) {
+  if (inet_pton(AF_INET, buf4, (char*)&a4)) {
     addr4.sin_addr.s_addr = a4.s_addr;
     addr.ss_family = AF_INET;
     p = start + strlen(buf4);
-  } else if (inet_pton(AF_INET6, buf6, &a6)) {
+  } else if (inet_pton(AF_INET6, buf6, (char*)&a6)) {
     addr.ss_family = AF_INET6;
     memcpy(&addr6.sin6_addr, &a6, sizeof(a6));
     p = start + strlen(buf6);

@@ -116,10 +116,10 @@ struct CommandOp
 /* getdir result */
 struct DirEntry {
   string d_name;
-  struct stat st;
+  struct stat_ceph st;
   int stmask;
   DirEntry(const string &s) : d_name(s), stmask(0) {}
-  DirEntry(const string &n, struct stat& s, int stm) : d_name(n), st(s), stmask(stm) {}
+  DirEntry(const string &n, struct stat_ceph& s, int stm) : d_name(n), st(s), stmask(stm) {}
 };
 
 struct Cap;
@@ -457,8 +457,8 @@ protected:
   // path traversal for high-level interface
   InodeRef cwd;
   int path_walk(const filepath& fp, InodeRef *end, bool followsym=true);
-  int fill_stat(Inode *in, struct stat *st, frag_info_t *dirstat=0, nest_info_t *rstat=0);
-  int fill_stat(InodeRef& in, struct stat *st, frag_info_t *dirstat=0, nest_info_t *rstat=0) {
+  int fill_stat(Inode *in, struct stat_ceph *st, frag_info_t *dirstat=0, nest_info_t *rstat=0);
+  int fill_stat(InodeRef& in, struct stat_ceph *st, frag_info_t *dirstat=0, nest_info_t *rstat=0) {
     return fill_stat(in.get(), st, dirstat, rstat);
   }
   void touch_dn(Dentry *dn);
@@ -649,7 +649,7 @@ private:
   void fill_dirent(struct dirent *de, const char *name, int type, uint64_t ino, loff_t next_off);
 
   // some readdir helpers
-  typedef int (*add_dirent_cb_t)(void *p, struct dirent *de, struct stat *st, int stmask, off_t off);
+  typedef int (*add_dirent_cb_t)(void *p, struct dirent *de, struct stat_ceph *st, int stmask, off_t off);
 
   int _opendir(Inode *in, dir_result_t **dirpp, int uid=-1, int gid=-1);
   void _readdir_drop_dirp_buffer(dir_result_t *dirp);
@@ -694,8 +694,8 @@ private:
   int _rmdir(Inode *dir, const char *name, int uid=-1, int gid=-1);
   int _symlink(Inode *dir, const char *name, const char *target, int uid=-1, int gid=-1, InodeRef *inp = 0);
   int _mknod(Inode *dir, const char *name, mode_t mode, dev_t rdev, int uid=-1, int gid=-1, InodeRef *inp = 0);
-  int _setattr(Inode *in, struct stat *attr, int mask, int uid=-1, int gid=-1, InodeRef *inp = 0);
-  int _setattr(InodeRef &in, struct stat *attr, int mask, int uid=-1, int gid=-1, InodeRef *inp = 0) {
+  int _setattr(Inode *in, struct stat_ceph *attr, int mask, int uid=-1, int gid=-1, InodeRef *inp = 0);
+  int _setattr(InodeRef &in, struct stat_ceph *attr, int mask, int uid=-1, int gid=-1, InodeRef *inp = 0) {
     return _setattr(in.get(), attr, mask, uid, gid, inp);
   }
   int _getattr(Inode *in, int mask, int uid=-1, int gid=-1, bool force=false);
@@ -823,7 +823,7 @@ public:
 
   struct dirent * readdir(dir_result_t *d);
   int readdir_r(dir_result_t *dirp, struct dirent *de);
-  int readdirplus_r(dir_result_t *dirp, struct dirent *de, struct stat *st, int *stmask);
+  int readdirplus_r(dir_result_t *dirp, struct dirent *de, struct stat_ceph *st, int *stmask);
 
   int getdir(const char *relpath, list<string>& names);  // get the whole dir at once.
 
@@ -859,12 +859,12 @@ public:
   int symlink(const char *existing, const char *newname);
 
   // inode stuff
-  int stat(const char *path, struct stat *stbuf, frag_info_t *dirstat=0, int mask=CEPH_STAT_CAP_INODE_ALL);
-  int lstat(const char *path, struct stat *stbuf, frag_info_t *dirstat=0, int mask=CEPH_STAT_CAP_INODE_ALL);
+  int stat(const char *path, struct stat_ceph *stbuf, frag_info_t *dirstat=0, int mask=CEPH_STAT_CAP_INODE_ALL);
+  int lstat(const char *path, struct stat_ceph *stbuf, frag_info_t *dirstat=0, int mask=CEPH_STAT_CAP_INODE_ALL);
   int lstatlite(const char *path, struct statlite *buf);
 
-  int setattr(const char *relpath, struct stat *attr, int mask);
-  int fsetattr(int fd, struct stat *attr, int mask);
+  int setattr(const char *relpath, struct stat_ceph *attr, int mask);
+  int fsetattr(int fd, struct stat_ceph *attr, int mask);
   int chmod(const char *path, mode_t mode);
   int fchmod(int fd, mode_t mode);
   int lchmod(const char *path, mode_t mode);
@@ -893,7 +893,7 @@ public:
   int fake_write_size(int fd, loff_t size);
   int ftruncate(int fd, loff_t size);
   int fsync(int fd, bool syncdataonly);
-  int fstat(int fd, struct stat *stbuf);
+  int fstat(int fd, struct stat_ceph *stbuf);
   int fallocate(int fd, int mode, loff_t offset, loff_t length);
 
   // full path xattr ops

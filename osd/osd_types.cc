@@ -22,6 +22,7 @@ extern "C" {
 }
 //by ketor #include "PG.h"
 #include "OSDMap.h"
+#include "include/stringify.h"
 //by ketor #include "PGBackend.h"
 
 const char *ceph_osd_flag_name(unsigned flag)

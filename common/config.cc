@@ -36,6 +36,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+
 /* Don't use standard Ceph logging in this file.
  * We can't use logging until it's initialized, and a lot of the necessary
  * initialization happens here.
@@ -877,6 +878,25 @@ int md_config_t::set_val_impl(const char *val, const config_option *opt)
     return ret;
   changed.insert(opt->name);
   return 0;
+}
+
+int strcasecmp(const char *dst, const char *src)
+{
+	int ch1, ch2;
+	do
+	{
+		if (((ch1 = (unsigned char)(*(dst++))) >= 'A') && (ch1 <= 'Z'))
+		{
+			ch1 += 0x20;
+			//printf("ch1=%d\n",ch1);
+		}
+        if ( ((ch2 = (unsigned char)(*(src++))) >= 'A') &&(ch2 <= 'Z') )
+        {
+			ch2 += 0x20;
+			//printf("ch2=%d\n",ch2);
+		}
+   } while ( ch1 && (ch1 == ch2) );
+   return(ch1 - ch2);
 }
 
 int md_config_t::set_val_raw(const char *val, const config_option *opt)

@@ -1027,7 +1027,7 @@ void cap_reconnect_t::generate_test_instances(list<cap_reconnect_t*>& ls)
   ls.back()->path = "/test/path";
   ls.back()->capinfo.cap_id = 1;
 }
-
+/*
 void MDSCacheObject::dump(Formatter *f) const
 {
   f->dump_bool("is_auth", is_auth());
@@ -1073,21 +1073,23 @@ void MDSCacheObject::dump(Formatter *f) const
 #endif
     f->dump_int("nref", ref);
 }
-
+*/
 /*
  * Use this in subclasses when printing their specialized
  * states too.
  */
-void MDSCacheObject::dump_states(Formatter *f) const
+/*void MDSCacheObject::dump_states(Formatter *f) const
 {
+  
   if (state_test(STATE_AUTH)) f->dump_string("state", "auth");
   if (state_test(STATE_DIRTY)) f->dump_string("state", "dirty");
   if (state_test(STATE_NOTIFYREF)) f->dump_string("state", "notifyref");
   if (state_test(STATE_REJOINING)) f->dump_string("state", "rejoining");
   if (state_test(STATE_REJOINUNDEF))
     f->dump_string("state", "rejoinundef");
+ 
 }
-
+ */
 void ceph_file_layout_wrapper::dump(Formatter *f) const
 {
   ::dump(static_cast<const ceph_file_layout&>(*this), f);

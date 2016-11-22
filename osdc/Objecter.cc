@@ -486,7 +486,7 @@ void Objecter::_send_linger(LingerOp *info)
   logger->inc(l_osdc_linger_send);
 }
 
-void Objecter::_linger_commit(LingerOp *info, int r) 
+void Objecter::_linger_commit(LingerOp *info, int r, bufferlist& outbl)
 {
   RWLock::WLocker wl(info->watch_lock);
   ldout(cct, 10) << "_linger_commit " << info->linger_id << dendl;

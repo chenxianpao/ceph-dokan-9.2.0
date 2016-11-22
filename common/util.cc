@@ -13,6 +13,7 @@
  */
 
 #include <errno.h>
+//#include <sys/utsname.h>
 #include <boost/lexical_cast.hpp>
 
 #include "include/util.h"
@@ -145,6 +146,7 @@ static bool lsb_release_set(char *buf, const char *prefix,
 
 static void lsb_release_parse(map<string, string> *m, CephContext *cct)
 {
+  /*
   FILE *fp = popen("lsb_release -idrc", "r");
   if (!fp) {
     int ret = -errno;
@@ -170,11 +172,13 @@ static void lsb_release_parse(map<string, string> *m, CephContext *cct)
     int ret = -errno;
     lderr(cct) << "lsb_release_parse - pclose failed: " << cpp_strerror(ret) << dendl;
   }
+  */
 }
 
 void collect_sys_info(map<string, string> *m, CephContext *cct)
 {
   // kernel info
+  /*
   struct utsname u;
   int r = uname(&u);
   if (r >= 0) {
@@ -184,8 +188,10 @@ void collect_sys_info(map<string, string> *m, CephContext *cct)
     (*m)["hostname"] = u.nodename;
     (*m)["arch"] = u.machine;
   }
+  */
 
   // memory
+  /*
   FILE *f = fopen("/proc/meminfo", "r");
   if (f) {
     char buf[100];
@@ -205,8 +211,9 @@ void collect_sys_info(map<string, string> *m, CephContext *cct)
     }
     fclose(f);
   }
-
+  */
   // processor
+  /*
   f = fopen("/proc/cpuinfo", "r");
   if (f) {
     char buf[100];
@@ -229,9 +236,9 @@ void collect_sys_info(map<string, string> *m, CephContext *cct)
     }
     fclose(f);
   }
-
+  */
   // distro info
-  lsb_release_parse(m, cct);
+  //lsb_release_parse(m, cct);
 }
 
 void dump_services(Formatter* f, const map<string, list<int> >& services, const char* type)

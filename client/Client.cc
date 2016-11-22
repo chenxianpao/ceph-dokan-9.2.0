@@ -25,12 +25,14 @@
 #define	EDQUOT		122	/* Quota exceeded by ketor*/
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/std_pair.hpp>
+#define XATTR_CREATE    0x1
+#define XATTR_REPLACE   0x2
 #if defined(__linux__)
 #include <linux/falloc.h>
 #endif
 
 //by ketor #include <sys/statvfs.h>
-
+#include "include/stringify.h"
 #include <iostream>
 using namespace std;
 
@@ -5783,7 +5785,7 @@ int Client::_getattr(Inode *in, int mask, int uid, int gid, bool force)
   return res;
 }
 
-int Client::_setattr(Inode *in, struct stat *attr, int mask, int uid, int gid,
+int Client::_setattr(Inode *in, struct stat_ceph *attr, int mask, int uid, int gid,
 		     InodeRef *inp)
 {
   int issued = in->caps_issued();
@@ -5905,7 +5907,7 @@ int Client::_setattr(Inode *in, struct stat *attr, int mask, int uid, int gid,
   return res;
 }
 
-int Client::setattr(const char *relpath, struct stat *attr, int mask)
+int Client::setattr(const char *relpath, struct stat_ceph *attr, int mask)
 {
   Mutex::Locker lock(client_lock);
   tout(cct) << "setattr" << std::endl;
@@ -5920,7 +5922,7 @@ int Client::setattr(const char *relpath, struct stat *attr, int mask)
   return _setattr(in, attr, mask);
 }
 
-int Client::fsetattr(int fd, struct stat *attr, int mask)
+int Client::fsetattr(int fd, struct stat_ceph *attr, int mask)
 {
   Mutex::Locker lock(client_lock);
   tout(cct) << "fsetattr" << std::endl;
@@ -5937,7 +5939,7 @@ int Client::fsetattr(int fd, struct stat *attr, int mask)
   return _setattr(f->inode, attr, mask);
 }
 
-int Client::stat(const char *relpath, struct stat *stbuf,
+int Client::stat(const char *relpath, struct stat_ceph *stbuf,
 			  frag_info_t *dirstat, int mask)
 {
   ldout(cct, 3) << "stat enter (relpath " << relpath << " mask " << mask << ")" << dendl;
@@ -5959,7 +5961,7 @@ int Client::stat(const char *relpath, struct stat *stbuf,
   return r;
 }
 
-int Client::lstat(const char *relpath, struct stat *stbuf,
+int Client::lstat(const char *relpath, struct stat_ceph *stbuf,
 			  frag_info_t *dirstat, int mask)
 {
   ldout(cct, 3) << "lstat enter (relpath " << relpath << " mask " << mask << ")" << dendl;
@@ -5982,12 +5984,12 @@ int Client::lstat(const char *relpath, struct stat *stbuf,
   return r;
 }
 
-int Client::fill_stat(Inode *in, struct stat *st, frag_info_t *dirstat, nest_info_t *rstat)
+int Client::fill_stat(Inode *in, struct stat_ceph *st, frag_info_t *dirstat, nest_info_t *rstat)
 {
   ldout(cct, 10) << "fill_stat on " << in->ino << " snap/dev" << in->snapid
 	   << " mode 0" << oct << in->mode << dec
 	   << " mtime " << in->mtime << " ctime " << in->ctime << dendl;
-  memset(st, 0, sizeof(struct stat));
+  memset(st, 0, sizeof(struct stat_ceph));
   if (use_faked_inos())
     st->st_ino = in->faked_ino;
   else
@@ -6043,7 +6045,7 @@ int Client::chmod(const char *relpath, mode_t mode)
   int r = path_walk(path, &in);
   if (r < 0)
     return r;
-  struct stat attr;
+  struct stat_ceph attr;
   attr.st_mode = mode;
   return _setattr(in, &attr, CEPH_SETATTR_MODE);
 }
@@ -6061,7 +6063,7 @@ int Client::fchmod(int fd, mode_t mode)
   if (f->flags & O_PATH)
     return -EBADF;
 #endif
-  struct stat attr;
+  struct stat_ceph attr;
   attr.st_mode = mode;
   return _setattr(f->inode, &attr, CEPH_SETATTR_MODE);
 }
@@ -6078,7 +6080,7 @@ int Client::lchmod(const char *relpath, mode_t mode)
   int r = path_walk(path, &in, false);
   if (r < 0)
     return r;
-  struct stat attr;
+  struct stat_ceph attr;
   attr.st_mode = mode;
   return _setattr(in, &attr, CEPH_SETATTR_MODE);
 }
@@ -6095,7 +6097,7 @@ int Client::chown(const char *relpath, int uid, int gid)
   int r = path_walk(path, &in);
   if (r < 0)
     return r;
-  struct stat attr;
+  struct stat_ceph attr;
   attr.st_uid = uid;
   attr.st_gid = gid;
   int mask = 0;
@@ -6118,7 +6120,7 @@ int Client::fchown(int fd, int uid, int gid)
   if (f->flags & O_PATH)
     return -EBADF;
 #endif
-  struct stat attr;
+  struct stat_ceph attr;
   attr.st_uid = uid;
   attr.st_gid = gid;
   int mask = 0;
@@ -6140,7 +6142,7 @@ int Client::lchown(const char *relpath, int uid, int gid)
   int r = path_walk(path, &in, false);
   if (r < 0)
     return r;
-  struct stat attr;
+  struct stat_ceph attr;
   attr.st_uid = uid;
   attr.st_gid = gid;
   int mask = 0;
@@ -6161,7 +6163,7 @@ int Client::utime(const char *relpath, struct utimbuf *buf)
   int r = path_walk(path, &in);
   if (r < 0)
     return r;
-  struct stat attr;
+  struct stat_ceph attr;
   stat_set_mtime_sec(&attr, buf->modtime);
   stat_set_mtime_nsec(&attr, 0);
   stat_set_atime_sec(&attr, buf->actime);
@@ -6182,7 +6184,7 @@ int Client::lutime(const char *relpath, struct utimbuf *buf)
   int r = path_walk(path, &in, false);
   if (r < 0)
     return r;
-  struct stat attr;
+  struct stat_ceph attr;
   stat_set_mtime_sec(&attr, buf->modtime);
   stat_set_mtime_nsec(&attr, 0);
   stat_set_atime_sec(&attr, buf->actime);
@@ -6482,9 +6484,9 @@ int Client::_readdir_cache_cb(dir_result_t *dirp, add_dirent_cb_t cb, void *p)
       continue;
     }
 
-    struct stat st;
+    struct stat_ceph st;
     struct dirent de;
-    int stmask = fill_stat(dn->inode, &st);
+    int stmask = fill_stat(dn->inode, &st);  
     fill_dirent(&de, dn->name.c_str(), st.st_mode, st.st_ino, dirp->offset + 1);
       
     uint64_t next_off = dn->offset + 1;
@@ -6528,7 +6530,7 @@ int Client::readdir_r_cb(dir_result_t *d, add_dirent_cb_t cb, void *p)
 	   << dendl;
 
   struct dirent de;
-  struct stat st;
+  struct stat_ceph st;
   memset(&de, 0, sizeof(de));
   memset(&st, 0, sizeof(st));
 
@@ -6694,12 +6696,12 @@ int Client::readdir_r(dir_result_t *d, struct dirent *de)
 
 struct single_readdir {
   struct dirent *de;
-  struct stat *st;
+  struct stat_ceph *st;
   int *stmask;
   bool full;
 };
 
-static int _readdir_single_dirent_cb(void *p, struct dirent *de, struct stat *st,
+static int _readdir_single_dirent_cb(void *p, struct dirent *de, struct stat_ceph *st,
 				     int stmask, off_t off)
 {
   single_readdir *c = static_cast<single_readdir *>(p);
@@ -6721,7 +6723,7 @@ struct dirent *Client::readdir(dir_result_t *d)
   int ret;
   static int stmask;
   static struct dirent de;
-  static struct stat st;
+  static struct stat_ceph st;
   single_readdir sr;
   sr.de = &de;
   sr.st = &st;
@@ -6741,7 +6743,7 @@ struct dirent *Client::readdir(dir_result_t *d)
   return (dirent *) NULL;
 }
 
-int Client::readdirplus_r(dir_result_t *d, struct dirent *de, struct stat *st, int *stmask)
+int Client::readdirplus_r(dir_result_t *d, struct dirent *de, struct stat_ceph *st, int *stmask)
 {  
   single_readdir sr;
   sr.de = de;
@@ -6768,7 +6770,7 @@ struct getdents_result {
   bool fullent;
 };
 
-static int _readdir_getdent_cb(void *p, struct dirent *de, struct stat *st, int stmask, off_t off)
+static int _readdir_getdent_cb(void *p, struct dirent *de, struct stat_ceph *st, int stmask, off_t off)
 {
   struct getdents_result *c = static_cast<getdents_result *>(p);
 
@@ -6820,7 +6822,7 @@ struct getdir_result {
   int num;
 };
 
-static int _getdir_cb(void *p, struct dirent *de, struct stat *st, int stmask, off_t off)
+static int _getdir_cb(void *p, struct dirent *de, struct stat_ceph *st, int stmask, off_t off)
 {
   getdir_result *r = static_cast<getdir_result *>(p);
 
@@ -6880,7 +6882,7 @@ int Client::open(const char *relpath, int flags, mode_t mode, int stripe_unit,
   InodeRef in;
   bool created = false;
   /* O_CREATE with O_EXCL enforces O_NOFOLLOW. */
-  bool followsym = !((flags & O_NOFOLLOW) || ((flags & O_CREAT) && (flags & O_EXCL)));
+  bool followsym = !(((flags & O_CREAT) && (flags & O_EXCL)));
   int r = path_walk(path, &in, followsym);
 
   if (r == 0 && (flags & O_CREAT) && (flags & O_EXCL))
@@ -6889,7 +6891,7 @@ int Client::open(const char *relpath, int flags, mode_t mode, int stripe_unit,
 #if defined(__linux__) && defined(O_PATH)
   if (r == 0 && in->is_symlink() && (flags & O_NOFOLLOW) && !(flags & O_PATH))
 #else
-  if (r == 0 && in->is_symlink() && (flags & O_NOFOLLOW))
+  if (r == 0 && in->is_symlink())
 #endif
     return -ELOOP;
 
@@ -7967,7 +7969,7 @@ int Client::_flush(Fh *f)
 
 int Client::truncate(const char *relpath, loff_t length) 
 {
-  struct stat attr;
+  struct stat_ceph attr;
   attr.st_size = length;
   return setattr(relpath, &attr, CEPH_SETATTR_SIZE);
 }
@@ -7986,7 +7988,7 @@ int Client::ftruncate(int fd, loff_t length)
   if (f->flags & O_PATH)
     return -EBADF;
 #endif
-  struct stat attr;
+  struct stat_ceph attr;
   attr.st_size = length;
   return _setattr(f->inode, &attr, CEPH_SETATTR_SIZE);
 }
@@ -8093,7 +8095,7 @@ int Client::_fsync(Fh *f, bool syncdataonly)
   return _fsync(f->inode.get(), syncdataonly);
 }
 
-int Client::fstat(int fd, struct stat *stbuf) 
+int Client::fstat(int fd, struct stat_ceph *stbuf) 
 {
   Mutex::Locker lock(client_lock);
   tout(cct) << "fstat" << std::endl;
@@ -8325,7 +8327,7 @@ int Client::_interrupt_filelock(MetaRequest *req)
     lock_type = CEPH_LOCK_FLOCK_INTR;
   else if (req->head.args.filelock_change.rule == CEPH_LOCK_FCNTL)
     lock_type = CEPH_LOCK_FCNTL_INTR;
-  else
+  else {
     assert(0);
     return -EINVAL;
   }
@@ -9537,7 +9539,7 @@ size_t Client::_vxattrs_calcu_name_size(const VXattr *vxattr)
 //}
 
 int Client::_mknod(Inode *dir, const char *name, mode_t mode, dev_t rdev,
-		   int uid, int gid, Inode **inp)
+		   int uid, int gid, InodeRef *inp)
 {
   ldout(cct, 3) << "_mknod(" << dir->ino << " " << name << ", 0" << oct
 		<< mode << dec << ", " << rdev << ", uid " << uid << ", gid "
@@ -9612,7 +9614,7 @@ int Client::_mknod(Inode *dir, const char *name, mode_t mode, dev_t rdev,
 //}
 
 int Client::_create(Inode *dir, const char *name, int flags, mode_t mode,
-		    Inode **inp, Fh **fhp, int stripe_unit, int stripe_count,
+		    InodeRef *inp, Fh **fhp, int stripe_unit, int stripe_count,
 		    int object_size, const char *data_pool, bool *created,
 		    int uid, int gid)
 {
@@ -10829,7 +10831,7 @@ int Client::fdescribe_layout(int fd, ceph_file_layout *lp)
   Fh *f = get_filehandle(fd);
   if (!f)
     return -EBADF;
-  Inode *in = f->inode;
+  Inode *in = f->inode.get();
 
   *lp = in->layout;
 
