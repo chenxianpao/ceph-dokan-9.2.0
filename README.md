@@ -54,4 +54,4 @@ Ceph-Dokan will get continuous improvement and upgrade with upstream Ceph code.
 
 Other
 -----------
-if can't run because interval_set.h, you need to change ino_t to long long from short in MinGW/include.
+if can't run because interval_set.h, you may need to change ino_t to unsigned long from short in MinGW/include.
